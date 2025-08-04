@@ -5,14 +5,45 @@ app:
   mode: advanced-chat
   name: boost-papers-agent
   use_icon_as_answer_icon: false
-dependencies: []
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.3.0@3d5be07581c53609a49d2bbb47be98c2e10820591bfc99f686b005d2c1ef95d9
 kind: app
 version: 0.3.0
 workflow:
   conversation_variables: []
   environment_variables: []
   features:
-    file_upload: {}
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
     opening_statement: ''
     retriever_resource:
       enabled: true
@@ -29,71 +60,261 @@ workflow:
       voice: ''
   graph:
     edges:
-    - id: 1750313008999-llm
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: question-classifier
+      id: 1750313008999-source-1754298531347-target
       source: '1750313008999'
       sourceHandle: source
-      target: llm
+      target: '1754298531347'
       targetHandle: target
-    - id: llm-answer
-      source: llm
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: llm
+      id: 1754298531347-1-1754299665828-target
+      source: '1754298531347'
+      sourceHandle: '1'
+      target: '1754299665828'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: llm
+      id: 1754299665828-source-1754300047273-target
+      source: '1754299665828'
+      sourceHandle: source
+      target: '1754300047273'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1754300047273-source-answer-target
+      source: '1754300047273'
       sourceHandle: source
       target: answer
       targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         desc: ''
+        selected: false
         title: Start
         type: start
         variables: []
+      height: 54
       id: '1750313008999'
       position:
+        x: 80
+        y: 282
+      positionAbsolute:
         x: 80
         y: 282
       sourcePosition: right
       targetPosition: left
       type: custom
+      width: 244
+    - data:
+        answer: '# 📄 Research Paper Analysis Complete
+
+
+          ## Paper Summary
+
+          {{#1754299665828.text#}}
+
+
+          ---
+
+
+          ## 🔬 Related Research & Rankings
+
+          {{#1754300047273.text#}}
+
+
+          ---'
+        desc: ''
+        selected: false
+        title: Answer
+        type: answer
+        variables: []
+      height: 170
+      id: answer
+      position:
+        x: 1323
+        y: 282
+      positionAbsolute:
+        x: 1323
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        classes:
+        - id: '1'
+          name: The user provided a URL or link to a research paper
+        - id: '2'
+          name: The user uploaded a PDF file or mentioned they have a PDF
+        - id: '1754298557716'
+          name: The user is asking for help or clarification about how to use the
+            system
+        desc: ''
+        instructions: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-pro
+          provider: langgenius/gemini/google
+        query_variable_selector:
+        - '1750313008999'
+        - sys.query
+        selected: false
+        title: Question Classifier
+        topics: []
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 258
+      id: '1754298531347'
+      position:
+        x: 389
+        y: 282
+      positionAbsolute:
+        x: 389
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
     - data:
         context:
           enabled: false
           variable_selector: []
         desc: ''
-        memory:
-          query_prompt_template: '{{#sys.query#}}'
-          window:
-            enabled: false
-            size: 10
         model:
           completion_params:
             temperature: 0.7
           mode: chat
-          name: ''
-          provider: ''
+          name: gemini-2.5-pro
+          provider: langgenius/gemini/google
         prompt_template:
-        - role: system
-          text: ''
-        selected: true
-        title: LLM
+        - id: ad7ffc7a-c326-446a-9a61-0b493d2e1006
+          role: system
+          text: 'You are an expert research paper analyst. Your task is to analyze
+            academic papers and provide comprehensive summaries.
+
+
+            Here is the url to the paper: {{#sys.query#}}
+
+
+            When analyzing a research paper, provide:
+
+
+            1. **Title and Authors** (if available)
+
+            2. **Abstract Summary** (2-3 sentences)
+
+            3. **Key Research Questions/Objectives**
+
+            4. **Methodology** (brief description of approach)
+
+            5. **Main Findings/Results** (3-5 key points)
+
+            6. **Significance/Impact** (why this research matters)
+
+            7. **Limitations** (if mentioned)
+
+            8. **Key Terms/Concepts** (important terminology)
+
+
+            Format your response clearly with headers and bullet points for easy reading.
+
+            Be concise but comprehensive. Focus on the most important aspects that
+            would help someone understand the paper''s contribution to the field.'
+        selected: false
+        title: Paper Analysis LLM
         type: llm
         variables: []
         vision:
           enabled: false
-      id: llm
+      height: 90
+      id: '1754299665828'
       position:
-        x: 380
+        x: 693
         y: 282
+      positionAbsolute:
+        x: 693
+        y: 282
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
+      width: 244
     - data:
-        answer: '{{#llm.text#}}'
+        context:
+          enabled: false
+          variable_selector: []
         desc: ''
-        title: Answer
-        type: answer
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-pro
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: ceb640be-2331-4714-9daf-e15281316498
+          role: system
+          text: "You are an expert research librarian and academic advisor. Your task\
+            \ is to recommend related research papers and rank them by relevance.\n\
+            \nBased on the paper analysis provided, generate:\n\n1. **Related Research\
+            \ Areas** (3-5 key areas this paper relates to)\n2. **Recommended Papers**\
+            \ (5-8 related papers with the following for each):\n   - Title (use realistic\
+            \ paper titles that would exist)\n   - Authors (use realistic author names)\n\
+            \   - Journal/Conference (appropriate venues)\n   - Year (realistic timeline)\n\
+            \   - Relevance Score (1-10, where 10 is most relevant)\n   - Brief Description\
+            \ (1-2 sentences explaining why it's relevant)\n\n3. **Research Gaps**\
+            \ (potential areas for future research)\n4. **Citation Recommendations**\
+            \ (which papers would be most important to cite)\n\nRank the papers from\
+            \ highest to lowest relevance score. Make sure the recommended papers\
+            \ are realistic and would genuinely relate to the research topic.\nFormat\
+            \ your response with clear sections and use a professional academic tone.\n\
+            \nHere is the paper analysis:\n{{#1754299665828.text#}}"
+        selected: false
+        title: Related Paper LLM
+        type: llm
         variables: []
-      id: answer
+        vision:
+          enabled: false
+      height: 90
+      id: '1754300047273'
       position:
-        x: 680
+        x: 991
         y: 282
+      positionAbsolute:
+        x: 991
+        y: 282
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
+      width: 244
+    viewport:
+      x: -149.24313639126524
+      y: 86.23118462084801
+      zoom: 0.8705505632961241
