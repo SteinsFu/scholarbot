@@ -9,9 +9,13 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/gemini:0.3.0@3d5be07581c53609a49d2bbb47be98c2e10820591bfc99f686b005d2c1ef95d9
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.4.1@a60729af3cee6164225765ef67868f641a6c2b804904ce1a0d4633936175428f
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/jina_tool:0.0.7@08d5935b56b9ddaa633204874c0fd796c14971489b6379fad1a430b5ec99b569
 kind: app
-version: 0.3.0
+version: 0.3.1
 workflow:
   conversation_variables: []
   environment_variables: []
@@ -63,30 +67,6 @@ workflow:
     - data:
         isInIteration: false
         isInLoop: false
-        sourceType: start
-        targetType: question-classifier
-      id: 1750313008999-source-1754298531347-target
-      source: '1750313008999'
-      sourceHandle: source
-      target: '1754298531347'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: question-classifier
-        targetType: llm
-      id: 1754298531347-1-1754299665828-target
-      source: '1754298531347'
-      sourceHandle: '1'
-      target: '1754299665828'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
         sourceType: llm
         targetType: llm
       id: 1754299665828-source-1754300047273-target
@@ -108,6 +88,29 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: tool
+      id: 1750313008999-source-1755335375060-target
+      source: '1750313008999'
+      sourceHandle: source
+      target: '1755335375060'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: llm
+      id: 1755335375060-source-1754299665828-target
+      source: '1755335375060'
+      sourceHandle: source
+      target: '1754299665828'
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         desc: ''
@@ -118,11 +121,12 @@ workflow:
       height: 54
       id: '1750313008999'
       position:
-        x: 80
+        x: 364.2905431103252
         y: 282
       positionAbsolute:
-        x: 80
+        x: 364.2905431103252
         y: 282
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -150,52 +154,13 @@ workflow:
         title: Answer
         type: answer
         variables: []
-      height: 170
+      height: 171
       id: answer
       position:
-        x: 1323
+        x: 1623
         y: 282
       positionAbsolute:
-        x: 1323
-        y: 282
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
-        classes:
-        - id: '1'
-          name: The user provided a URL or link to a research paper
-        - id: '2'
-          name: The user uploaded a PDF file or mentioned they have a PDF
-        - id: '1754298557716'
-          name: The user is asking for help or clarification about how to use the
-            system
-        desc: ''
-        instructions: ''
-        model:
-          completion_params:
-            temperature: 0.7
-          mode: chat
-          name: gemini-2.5-pro
-          provider: langgenius/gemini/google
-        query_variable_selector:
-        - '1750313008999'
-        - sys.query
-        selected: false
-        title: Question Classifier
-        topics: []
-        type: question-classifier
-        vision:
-          enabled: false
-      height: 258
-      id: '1754298531347'
-      position:
-        x: 389
-        y: 282
-      positionAbsolute:
-        x: 389
+        x: 1623
         y: 282
       selected: false
       sourcePosition: right
@@ -211,42 +176,25 @@ workflow:
           completion_params:
             temperature: 0.7
           mode: chat
-          name: gemini-2.5-pro
+          name: gemini-2.5-flash
           provider: langgenius/gemini/google
         prompt_template:
         - id: ad7ffc7a-c326-446a-9a61-0b493d2e1006
           role: system
-          text: 'You are an expert research paper analyst. Your task is to analyze
-            academic papers and provide comprehensive summaries.
-
-
-            Here is the url to the paper: {{#sys.query#}}
-
-
-            When analyzing a research paper, provide:
-
-
-            1. **Title and Authors** (if available)
-
-            2. **Abstract Summary** (2-3 sentences)
-
-            3. **Key Research Questions/Objectives**
-
-            4. **Methodology** (brief description of approach)
-
-            5. **Main Findings/Results** (3-5 key points)
-
-            6. **Significance/Impact** (why this research matters)
-
-            7. **Limitations** (if mentioned)
-
-            8. **Key Terms/Concepts** (important terminology)
-
-
-            Format your response clearly with headers and bullet points for easy reading.
-
-            Be concise but comprehensive. Focus on the most important aspects that
-            would help someone understand the paper''s contribution to the field.'
+          text: "You are an expert research paper analyst. Your task is to analyze\
+            \ academic papers and provide comprehensive summaries.\n\nHere is the\
+            \ extracted content of the paper: \n<paper>\n{{#1755335375060.text#}}\n\
+            </paper>\n\nWhen analyzing a research paper, provide:\n\n1. **Title and\
+            \ Authors** (if available)\n2. **Abstract Summary** (2-3 sentences)\n\
+            3. **Key Research Questions/Objectives**\n4. **Methodology** (brief description\
+            \ of approach)\n5. **Main Findings/Results** (3-5 key points)\n6. **Significance/Impact**\
+            \ (why this research matters)\n7. **Limitations** (if mentioned)\n8. **Key\
+            \ Terms/Concepts** (important terminology)\n\nFormat your response clearly\
+            \ with headers and bullet points for easy reading.\nBe concise but comprehensive.\
+            \ Focus on the most important aspects that would help someone understand\
+            \ the paper's contribution to the field."
+        - role: user
+          text: '{{#sys.query#}}'
         selected: false
         title: Paper Analysis LLM
         type: llm
@@ -256,10 +204,10 @@ workflow:
       height: 90
       id: '1754299665828'
       position:
-        x: 693
+        x: 993
         y: 282
       positionAbsolute:
-        x: 693
+        x: 993
         y: 282
       selected: false
       sourcePosition: right
@@ -281,20 +229,37 @@ workflow:
         - id: ceb640be-2331-4714-9daf-e15281316498
           role: system
           text: "You are an expert research librarian and academic advisor. Your task\
-            \ is to recommend related research papers and rank them by relevance.\n\
-            \nBased on the paper analysis provided, generate:\n\n1. **Related Research\
-            \ Areas** (3-5 key areas this paper relates to)\n2. **Recommended Papers**\
-            \ (5-8 related papers with the following for each):\n   - Title (use realistic\
-            \ paper titles that would exist)\n   - Authors (use realistic author names)\n\
-            \   - Journal/Conference (appropriate venues)\n   - Year (realistic timeline)\n\
-            \   - Relevance Score (1-10, where 10 is most relevant)\n   - Brief Description\
-            \ (1-2 sentences explaining why it's relevant)\n\n3. **Research Gaps**\
-            \ (potential areas for future research)\n4. **Citation Recommendations**\
-            \ (which papers would be most important to cite)\n\nRank the papers from\
-            \ highest to lowest relevance score. Make sure the recommended papers\
-            \ are realistic and would genuinely relate to the research topic.\nFormat\
-            \ your response with clear sections and use a professional academic tone.\n\
-            \nHere is the paper analysis:\n{{#1754299665828.text#}}"
+            \ is to identify and rank research papers that are most relevant to the\
+            \ given paper. \n\n### Instructions:\n1. **Identify Related Papers from\
+            \ the Given Paper**  \n   - Examine the *Related Work* and *References*\
+            \ sections of the provided paper.  \n   - Select only those papers that\
+            \ are directly related to the same research area or topic (e.g., if the\
+            \ paper is about image editing, include only other image editing papers).\
+            \  \n   - Exclude citations that are foundational, general-purpose, or\
+            \ unrelated to the specific research area (e.g., references for equations,\
+            \ generic background models, or unrelated subfields).\n\n2. **Identify\
+            \ Additional Related Papers from External Sources**  \n   - Based on the\
+            \ provided paper analysis, search for and include other highly related\
+            \ works published in the same research domain.  \n   - Ensure these additional\
+            \ papers meet the same criteria: they must be on a similar topic and conduct\
+            \ comparable research.\n\n3. **Ranking Criteria**  \n   - Rank the listed\
+            \ papers in order of **similarity and importance** to the given paper.\
+            \  \n   - Use these factors (and any others you find reasonable) to guide\
+            \ ranking:  \n     - If the paper directly builds upon another (e.g.,\
+            \ uses it as a backbone or framework), that paper ranks higher.  \n  \
+            \   - If a paper is used as a baseline for comparison, it ranks lower\
+            \ than a backbone but higher than peripheral references.  \n     - If\
+            \ the paper is conceptually very close in methodology or application,\
+            \ it ranks higher than tangential works.  \n\n4. **Output Format**  \n\
+            \   - Provide a **ranked list** of related papers.  \n   - For each paper,\
+            \ include:  \n     - Full citation (title, authors, venue, year if available).\
+            \  \n     - A short explanation of why it is relevant and how it relates\
+            \ to the given paper.  \n     - Justification for its ranking position.\
+            \  \n\n### Input:\nPaper content:  \n<paper>  \n{{#1755335375060.text#}}\
+            \  \n</paper>  \n\nPaper analysis:  \n<analysis>\n{{#1754299665828.text#}}\
+            \  \n</analysis>  \n"
+        - role: user
+          text: '{{#sys.query#}}'
         selected: false
         title: Related Paper LLM
         type: llm
@@ -304,17 +269,444 @@ workflow:
       height: 90
       id: '1754300047273'
       position:
-        x: 991
+        x: 1291
         y: 282
       positionAbsolute:
-        x: 991
+        x: 1291
         y: 282
       selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 244
+    - data:
+        desc: ''
+        is_team_authorization: false
+        output_schema: null
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Web link
+            ja_JP: Web link
+            pt_BR: URL da web
+            zh_Hans: 网页链接
+          label:
+            en_US: URL
+            ja_JP: URL
+            pt_BR: URL
+            zh_Hans: 网址
+          llm_description: url para scraping
+          max: null
+          min: null
+          name: url
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: 'request parameters, format: {"key1": "value1", "key2": "value2"}
+
+              '
+            ja_JP: 'request parameters, format: {"key1": "value1", "key2": "value2"}
+
+              '
+            pt_BR: 'parâmetros de solicitação, formato: {"key1": "value1", "key2":
+              "value2"}
+
+              '
+            zh_Hans: '请求参数，格式：{"key1": "value1", "key2": "value2"}
+
+              '
+          label:
+            en_US: Request params
+            ja_JP: Request params
+            pt_BR: Parâmetros de solicitação
+            zh_Hans: 请求参数
+          llm_description: request parameters
+          max: null
+          min: null
+          name: request_params
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: form
+          human_description:
+            en_US: css selector for scraping specific elements
+            ja_JP: css selector for scraping specific elements
+            pt_BR: css selector para scraping de elementos específicos
+            zh_Hans: css 选择器用于抓取特定元素
+          label:
+            en_US: Target selector
+            ja_JP: Target selector
+            pt_BR: Seletor de destino
+            zh_Hans: 目标选择器
+          llm_description: css selector of the target element to scrape
+          max: null
+          min: null
+          name: target_selector
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: form
+          human_description:
+            en_US: css selector for waiting for specific elements
+            ja_JP: css selector for waiting for specific elements
+            pt_BR: css selector para aguardar elementos específicos
+            zh_Hans: css 选择器用于等待特定元素
+          label:
+            en_US: Wait for selector
+            ja_JP: Wait for selector
+            pt_BR: Aguardar por seletor
+            zh_Hans: 等待选择器
+          llm_description: css selector of the target element to wait for
+          max: null
+          min: null
+          name: wait_for_selector
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: form
+          human_description:
+            en_US: Remove all images from the response.
+            ja_JP: Remove all images from the response.
+            pt_BR: Remove all images from the response.
+            zh_Hans: 从响应中删除所有图片。
+          label:
+            en_US: Remove images
+            ja_JP: Remove images
+            pt_BR: Remove images
+            zh_Hans: 删除图片
+          llm_description: Remove all images from the response
+          max: null
+          min: null
+          name: remove_images
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: 'Captions all images at the specified URL, adding ''Image [idx]:
+              [caption]'' as an alt tag for those without one. This allows downstream
+              LLMs to interact with the images in activities such as reasoning and
+              summarizing.'
+            ja_JP: 'Captions all images at the specified URL, adding ''Image [idx]:
+              [caption]'' as an alt tag for those without one. This allows downstream
+              LLMs to interact with the images in activities such as reasoning and
+              summarizing.'
+            pt_BR: 'Adiciona legendas a todas as imagens na URL especificada, adicionando
+              ''Imagem [idx]: [legenda]'' como uma tag alt para aquelas que não têm
+              uma. Isso permite que os modelos LLM inferiores interajam com as imagens
+              em atividades como raciocínio e resumo.'
+            zh_Hans: '为指定 URL 上的所有图像添加标题，为没有标题的图像添加“Image [idx]: [caption]”作为 alt
+              标签，以支持下游模型的图像交互。'
+          label:
+            en_US: Image caption
+            ja_JP: Image caption
+            pt_BR: Legenda da imagem
+            zh_Hans: 图片说明
+          llm_description: Captions all images at the specified URL
+          max: null
+          min: null
+          name: image_caption
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: A "Buttons & Links" section will be created at the end. This helps
+              the downstream LLMs or web agents navigating the page or take further
+              actions.
+            ja_JP: A "Buttons & Links" section will be created at the end. This helps
+              the downstream LLMs or web agents navigating the page or take further
+              actions.
+            pt_BR: Um "Botões & Links" section will be created at the end. This helps
+              the downstream LLMs or web agents navigating the page or take further
+              actions.
+            zh_Hans: 末尾将添加“按钮和链接”部分，方便下游模型或网络代理做页面导航或执行进一步操作。
+          label:
+            en_US: Gather all links at the end
+            ja_JP: Gather all links at the end
+            pt_BR: Coletar todos os links ao final
+            zh_Hans: 将所有链接集中到最后
+          llm_description: Gather all links at the end
+          max: null
+          min: null
+          name: gather_all_links_at_the_end
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: An "Images" section will be created at the end. This gives the
+              downstream LLMs an overview of all visuals on the page, which may improve
+              reasoning.
+            ja_JP: An "Images" section will be created at the end. This gives the
+              downstream LLMs an overview of all visuals on the page, which may improve
+              reasoning.
+            pt_BR: Um "Imagens" section will be created at the end. This gives the
+              downstream LLMs an overview of all visuals on the page, which may improve
+              reasoning.
+            zh_Hans: 末尾会新增“图片”部分，方便下游模型全面了解页面的视觉内容，提升推理效果。
+          label:
+            en_US: Gather all images at the end
+            ja_JP: Gather all images at the end
+            pt_BR: Coletar todas as imagens ao final
+            zh_Hans: 将所有图片集中到最后
+          llm_description: Gather all images at the end
+          max: null
+          min: null
+          name: gather_all_images_at_the_end
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: null
+          form: form
+          human_description:
+            en_US: Use proxy to access URLs
+            ja_JP: Use proxy to access URLs
+            pt_BR: Use proxy to access URLs
+            zh_Hans: 利用代理访问 URL
+          label:
+            en_US: Proxy server
+            ja_JP: Proxy server
+            pt_BR: Servidor de proxy
+            zh_Hans: 代理服务器
+          llm_description: Use proxy to access URLs
+          max: null
+          min: null
+          name: proxy_server
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: Bypass the Cache
+            ja_JP: Bypass the Cache
+            pt_BR: Ignorar o cache
+            zh_Hans: 是否绕过缓存
+          label:
+            en_US: Bypass the Cache
+            ja_JP: Bypass the Cache
+            pt_BR: Ignorar o cache
+            zh_Hans: 绕过缓存
+          llm_description: bypass the cache
+          max: null
+          min: null
+          name: no_cache
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: When enabled, request results won't be cached on jina servers.
+            ja_JP: When enabled, request results won't be cached on jina servers.
+            pt_BR: When enabled, request results won't be cached on jina servers.
+            zh_Hans: 启用后，请求结果将不会被缓存在 jina 服务器上。
+          label:
+            en_US: Do Not Cache/Track
+            ja_JP: Do Not Cache/Track
+            pt_BR: Do Not Cache/Track
+            zh_Hans: 请勿缓存/追踪
+          llm_description: Do Not Cache/Track
+          max: null
+          min: null
+          name: no_cache_track
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: Enable summary for the output
+            ja_JP: Enable summary for the output
+            pt_BR: Habilitar resumo para a saída
+            zh_Hans: 为输出启用摘要
+          label:
+            en_US: Enable summary
+            ja_JP: Enable summary
+            pt_BR: Habilitar resumo
+            zh_Hans: 是否启用摘要
+          llm_description: enable summary
+          max: null
+          min: null
+          name: summary
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: 3
+          form: form
+          human_description:
+            en_US: Number of times to retry the request if it fails
+            ja_JP: Number of times to retry the request if it fails
+            pt_BR: Número de vezes para repetir a solicitação se falhar
+            zh_Hans: 请求失败时重试的次数
+          label:
+            en_US: Retry
+            ja_JP: Retry
+            pt_BR: Repetir
+            zh_Hans: 重试
+          llm_description: Number of times to retry the request if it fails
+          max: null
+          min: null
+          name: max_retries
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: number
+        params:
+          gather_all_images_at_the_end: ''
+          gather_all_links_at_the_end: ''
+          image_caption: ''
+          max_retries: ''
+          no_cache: ''
+          no_cache_track: ''
+          proxy_server: ''
+          remove_images: ''
+          request_params: ''
+          summary: ''
+          target_selector: ''
+          url: ''
+          wait_for_selector: ''
+        provider_id: langgenius/jina_tool/jina
+        provider_name: langgenius/jina_tool/jina
+        provider_type: builtin
+        selected: false
+        title: Fetch Single Page
+        tool_configurations:
+          gather_all_images_at_the_end:
+            type: constant
+            value: false
+          gather_all_links_at_the_end:
+            type: constant
+            value: false
+          image_caption:
+            type: constant
+            value: false
+          max_retries:
+            type: constant
+            value: 3
+          no_cache:
+            type: constant
+            value: false
+          no_cache_track:
+            type: constant
+            value: false
+          proxy_server:
+            type: mixed
+            value: null
+          remove_images:
+            type: constant
+            value: null
+          summary:
+            type: constant
+            value: false
+          target_selector:
+            type: mixed
+            value: null
+          wait_for_selector:
+            type: mixed
+            value: null
+        tool_description: Fetch the target URL (can be a PDF) and convert it into
+          a LLM-friendly markdown.
+        tool_label: Fetch Single Page
+        tool_name: jina_reader
+        tool_node_version: '2'
+        tool_parameters:
+          request_params:
+            type: mixed
+            value: null
+          url:
+            type: mixed
+            value: '{{#sys.query#}}'
+        type: tool
+      height: 350
+      id: '1755335375060'
+      position:
+        x: 669.761295457004
+        y: 282
+      positionAbsolute:
+        x: 669.761295457004
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
     viewport:
-      x: -149.24313639126524
-      y: 86.23118462084801
-      zoom: 0.8705505632961241
+      x: -170.20405709984414
+      y: 101.73083509940068
+      zoom: 0.6308835600817385
