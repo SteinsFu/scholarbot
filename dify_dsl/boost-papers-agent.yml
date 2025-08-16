@@ -193,7 +193,8 @@ workflow:
             \ with headers and bullet points for easy reading.\nBe concise but comprehensive.\
             \ Focus on the most important aspects that would help someone understand\
             \ the paper's contribution to the field."
-        - role: user
+        - id: 9dc8fc06-d772-4f4f-8f42-481749033b5d
+          role: user
           text: '{{#sys.query#}}'
         selected: false
         title: Paper Analysis LLM
@@ -252,15 +253,16 @@ workflow:
             \ the paper is conceptually very close in methodology or application,\
             \ it ranks higher than tangential works.  \n\n4. **Output Format**  \n\
             \   - Provide a **ranked list** of related papers.  \n   - For each paper,\
-            \ include:  \n     - Full citation (title, authors, venue, year if available).\
-            \  \n     - A short explanation of why it is relevant and how it relates\
-            \ to the given paper.  \n     - Justification for its ranking position.\
-            \  \n\n### Input:\nPaper content:  \n<paper>  \n{{#1755335375060.text#}}\
+            \ include:  \n     - Title\n     - A tag: (Mentioned in the paper) or\
+            \ (Extra sources)\n     - A short explanation of why it is relevant and\
+            \ how it relates to the given paper.  \n     - Justification for its ranking\
+            \ position.  \n\n### Input:\nPaper content:  \n<paper>  \n{{#1755335375060.text#}}\
             \  \n</paper>  \n\nPaper analysis:  \n<analysis>\n{{#1754299665828.text#}}\
             \  \n</analysis>  \n"
-        - role: user
+        - id: b87b542f-b53e-4efb-a30e-d23af5c03442
+          role: user
           text: '{{#sys.query#}}'
-        selected: false
+        selected: true
         title: Related Paper LLM
         type: llm
         variables: []
@@ -707,6 +709,6 @@ workflow:
       type: custom
       width: 244
     viewport:
-      x: -170.20405709984414
-      y: 101.73083509940068
-      zoom: 0.6308835600817385
+      x: -471.34540266965735
+      y: 122.60239202797817
+      zoom: 0.5852930272676128
