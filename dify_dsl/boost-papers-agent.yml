@@ -92,20 +92,77 @@ workflow:
         isInIteration: false
         isInLoop: false
         sourceType: start
-        targetType: tool
-      id: 1750313008999-source-1755335375060-target
+        targetType: if-else
+      id: 1750313008999-source-1756262993362-target
       source: '1750313008999'
       sourceHandle: source
+      target: '1756262993362'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: tool
+      id: 1756262993362-true-1755335375060-target
+      source: '1756262993362'
+      sourceHandle: 'true'
       target: '1755335375060'
       targetHandle: target
       type: custom
       zIndex: 0
     - data:
         isInLoop: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: 1756262993362-0fc1f1f0-126e-4204-94fc-41dba7cec3d9-1756263129886-target
+      source: '1756262993362'
+      sourceHandle: 0fc1f1f0-126e-4204-94fc-41dba7cec3d9
+      target: '1756263129886'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1756262993362-false-1756263679180-target
+      source: '1756262993362'
+      sourceHandle: 'false'
+      target: '1756263679180'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
         sourceType: tool
-        targetType: llm
-      id: 1755335375060-source-1754299665828-target
+        targetType: code
+      id: 1755335375060-source-1756263858005-target
       source: '1755335375060'
+      sourceHandle: source
+      target: '1756263858005'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: document-extractor
+        targetType: code
+      id: 1756263129886-source-1756263858005-target
+      source: '1756263129886'
+      sourceHandle: source
+      target: '1756263858005'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: 1756263858005-source-1754299665828-target
+      source: '1756263858005'
       sourceHandle: source
       target: '1754299665828'
       targetHandle: target
@@ -117,8 +174,40 @@ workflow:
         selected: false
         title: Start
         type: start
-        variables: []
-      height: 54
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          default: English
+          label: language
+          max_length: 5
+          options:
+          - English
+          - Japanese
+          required: true
+          type: select
+          variable: language
+        - label: pdf_url
+          max_length: 200
+          options: []
+          required: false
+          type: text-input
+          variable: pdf_url
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          label: pdf_file
+          max_length: 48
+          options: []
+          required: false
+          type: file
+          variable: pdf_file
+      height: 142
       id: '1750313008999'
       position:
         x: 364.2905431103252
@@ -126,7 +215,7 @@ workflow:
       positionAbsolute:
         x: 364.2905431103252
         y: 282
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -154,13 +243,13 @@ workflow:
         title: Answer
         type: answer
         variables: []
-      height: 171
+      height: 170
       id: answer
       position:
-        x: 1623
+        x: 2223
         y: 282
       positionAbsolute:
-        x: 1623
+        x: 2223
         y: 282
       selected: false
       sourcePosition: right
@@ -169,8 +258,10 @@ workflow:
       width: 244
     - data:
         context:
-          enabled: false
-          variable_selector: []
+          enabled: true
+          variable_selector:
+          - '1756263858005'
+          - pdf_text
         desc: ''
         model:
           completion_params:
@@ -183,16 +274,17 @@ workflow:
           role: system
           text: "You are an expert research paper analyst. Your task is to analyze\
             \ academic papers and provide comprehensive summaries.\n\nHere is the\
-            \ extracted content of the paper: \n<paper>\n{{#1755335375060.text#}}\n\
-            </paper>\n\nWhen analyzing a research paper, provide:\n\n1. **Title and\
-            \ Authors** (if available)\n2. **Abstract Summary** (2-3 sentences)\n\
-            3. **Key Research Questions/Objectives**\n4. **Methodology** (brief description\
-            \ of approach)\n5. **Main Findings/Results** (3-5 key points)\n6. **Significance/Impact**\
+            \ extracted content of the paper: \n<paper>\n{{#context#}}\n</paper>\n\
+            \nWhen analyzing a research paper, provide:\n\n1. **Title and Authors**\
+            \ (if available)\n2. **Abstract Summary** (2-3 sentences)\n3. **Key Research\
+            \ Questions/Objectives**\n4. **Methodology** (brief description of approach)\n\
+            5. **Main Findings/Results** (3-5 key points)\n6. **Significance/Impact**\
             \ (why this research matters)\n7. **Limitations** (if mentioned)\n8. **Key\
             \ Terms/Concepts** (important terminology)\n\nFormat your response clearly\
             \ with headers and bullet points for easy reading.\nBe concise but comprehensive.\
             \ Focus on the most important aspects that would help someone understand\
-            \ the paper's contribution to the field."
+            \ the paper's contribution to the field.\n\nPlease output in the user-specified\
+            \ language: {{#1750313008999.language#}}."
         - id: 9dc8fc06-d772-4f4f-8f42-481749033b5d
           role: user
           text: '{{#sys.query#}}'
@@ -205,10 +297,10 @@ workflow:
       height: 90
       id: '1754299665828'
       position:
-        x: 993
+        x: 1593
         y: 282
       positionAbsolute:
-        x: 993
+        x: 1593
         y: 282
       selected: false
       sourcePosition: right
@@ -217,8 +309,10 @@ workflow:
       width: 244
     - data:
         context:
-          enabled: false
-          variable_selector: []
+          enabled: true
+          variable_selector:
+          - '1756263858005'
+          - pdf_text
         desc: ''
         model:
           completion_params:
@@ -256,13 +350,13 @@ workflow:
             \ include:  \n     - Title\n     - A tag: (Mentioned in the paper) or\
             \ (Extra sources)\n     - A short explanation of why it is relevant and\
             \ how it relates to the given paper.  \n     - Justification for its ranking\
-            \ position.  \n\n### Input:\nPaper content:  \n<paper>  \n{{#1755335375060.text#}}\
-            \  \n</paper>  \n\nPaper analysis:  \n<analysis>\n{{#1754299665828.text#}}\
-            \  \n</analysis>  \n"
+            \ position.  \n\n### Input:\nPaper content:  \n<paper>  \n{{#context#}}\n\
+            </paper>  \n\nPaper analysis:  \n<analysis>\n{{#1754299665828.text#}}\
+            \  \n</analysis>  \n\nPlease output in the user-specified language: {{#1750313008999.language#}}."
         - id: b87b542f-b53e-4efb-a30e-d23af5c03442
           role: user
           text: '{{#sys.query#}}'
-        selected: true
+        selected: false
         title: Related Paper LLM
         type: llm
         variables: []
@@ -271,12 +365,12 @@ workflow:
       height: 90
       id: '1754300047273'
       position:
-        x: 1291
+        x: 1891
         y: 282
       positionAbsolute:
-        x: 1291
+        x: 1891
         y: 282
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -647,7 +741,7 @@ workflow:
         provider_name: langgenius/jina_tool/jina
         provider_type: builtin
         selected: false
-        title: Fetch Single Page
+        title: URL to Text
         tool_configurations:
           gather_all_images_at_the_end:
             type: constant
@@ -693,10 +787,50 @@ workflow:
             value: null
           url:
             type: mixed
-            value: '{{#sys.query#}}'
+            value: '{{#1750313008999.pdf_url#}}'
         type: tool
       height: 350
       id: '1755335375060'
+      position:
+        x: 969.761295457004
+        y: 282
+      positionAbsolute:
+        x: 969.761295457004
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: eea82602-0f8f-4f7d-b303-84b05293c296
+            value: ''
+            varType: string
+            variable_selector:
+            - '1750313008999'
+            - pdf_url
+          id: 'true'
+          logical_operator: and
+        - case_id: 0fc1f1f0-126e-4204-94fc-41dba7cec3d9
+          conditions:
+          - comparison_operator: exists
+            id: 472bba09-1453-4250-bdea-d523c98cece2
+            value: ''
+            varType: file
+            variable_selector:
+            - '1750313008999'
+            - pdf_file
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: IF/ELSE
+        type: if-else
+      height: 174
+      id: '1756262993362'
       position:
         x: 669.761295457004
         y: 282
@@ -708,7 +842,109 @@ workflow:
       targetPosition: left
       type: custom
       width: 244
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: PDF to Text
+        type: document-extractor
+        variable_selector:
+        - '1750313008999'
+        - pdf_file
+      height: 94
+      id: '1756263129886'
+      position:
+        x: 969.761295457004
+        y: 671
+      positionAbsolute:
+        x: 969.761295457004
+        y: 671
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        author: Dify
+        desc: ''
+        height: 104
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Fetch
+          url into text, or convert pdf file into text.","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 104
+      id: '1756263505395'
+      position:
+        x: 969.761295457004
+        y: 159.8596673242403
+      positionAbsolute:
+        x: 969.761295457004
+        y: 159.8596673242403
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        answer: 'Error: Please input either "pdf_url" or "pdf_file".'
+        desc: ''
+        selected: false
+        title: Missing Arguments Error
+        type: answer
+        variables: []
+      height: 118
+      id: '1756263679180'
+      position:
+        x: 969.761295457004
+        y: 804
+      positionAbsolute:
+        x: 969.761295457004
+        y: 804
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(url2txt: str, pdf2txt: str) -> dict:\n    pdf_text = url2txt\
+          \ if url2txt else pdf2txt\n    return {\"pdf_text\": pdf_text}\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          pdf_text:
+            children: null
+            type: string
+        selected: false
+        title: Code
+        type: code
+        variables:
+        - value_selector:
+          - '1755335375060'
+          - text
+          value_type: string
+          variable: url2txt
+        - value_selector:
+          - '1756263129886'
+          - text
+          value_type: string
+          variable: pdf2txt
+      height: 54
+      id: '1756263858005'
+      position:
+        x: 1273.761295457004
+        y: 282
+      positionAbsolute:
+        x: 1273.761295457004
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
     viewport:
-      x: -471.34540266965735
-      y: 122.60239202797817
-      zoom: 0.5852930272676128
+      x: -25.099651000320023
+      y: 231.8026064699343
+      zoom: 0.32987697769322366
