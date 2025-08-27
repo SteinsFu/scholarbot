@@ -195,3 +195,7 @@ cython_debug/
 
 # Others
 dify/
+tensorboard_logs/
+pdfs/
+.vscode/
+.DS_Store

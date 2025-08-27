@@ -29,3 +29,28 @@
 
 ## Development of the Dify DSL
 (In progress...)
+
+
+
+
+## PDF Correlator (3D Visualization)
+
+Create an interactive 3D visualization of how a set of PDFs are semantically correlated using sentence embeddings (PyTorch).
+
+### Install
+```bash
+conda create -n boost-proj python==3.12
+conda activate boost-proj
+pip install -r requirements.txt
+```
+
+### Run (CLI)
+Create embeddings
+```bash
+python pdf_correlator.py
+```
+
+Visualize embeddings
+```bash
+tensorboard --logdir tensorboard_logs
+```

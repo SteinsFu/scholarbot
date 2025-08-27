@@ -1,0 +1,7 @@
+requests==2.32.5
+tqdm==4.67.1
+pymupdf==1.26.3
+torch==2.8.0
+sentence-transformers==5.1.0
+numpy==2.3.2
+tensorboard==2.20.0
