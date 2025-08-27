@@ -9,11 +9,11 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/gemini:0.4.1@a60729af3cee6164225765ef67868f641a6c2b804904ce1a0d4633936175428f
+    marketplace_plugin_unique_identifier: langgenius/jina_tool:0.0.7@08d5935b56b9ddaa633204874c0fd796c14971489b6379fad1a430b5ec99b569
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/jina_tool:0.0.7@08d5935b56b9ddaa633204874c0fd796c14971489b6379fad1a430b5ec99b569
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.3@5a7f82fa86e28332ad51941d0b491c1e8a38ead539656442f7bf4c6129cd15fa
 kind: app
 version: 0.3.1
 workflow:
@@ -215,13 +215,13 @@ workflow:
       positionAbsolute:
         x: 364.2905431103252
         y: 282
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 244
     - data:
-        answer: '# 📄 Research Paper Analysis Complete
+        answer: '# 📄 Research Paper Analysis
 
 
           ## Paper Summary
@@ -243,13 +243,13 @@ workflow:
         title: Answer
         type: answer
         variables: []
-      height: 170
+      height: 154
       id: answer
       position:
-        x: 2223
+        x: 2200.365685354301
         y: 282
       positionAbsolute:
-        x: 2223
+        x: 2200.365685354301
         y: 282
       selected: false
       sourcePosition: right
@@ -267,8 +267,8 @@ workflow:
           completion_params:
             temperature: 0.7
           mode: chat
-          name: gemini-2.5-flash
-          provider: langgenius/gemini/google
+          name: chatgpt-4o-latest
+          provider: langgenius/openai/openai
         prompt_template:
         - id: ad7ffc7a-c326-446a-9a61-0b493d2e1006
           role: system
@@ -287,7 +287,11 @@ workflow:
             \ language: {{#1750313008999.language#}}."
         - id: 9dc8fc06-d772-4f4f-8f42-481749033b5d
           role: user
-          text: '{{#sys.query#}}'
+          text: 'Perform your job and output in {{#1750313008999.language#}}.
+
+            Here are some extra requests:
+
+            {{#sys.query#}}'
         selected: false
         title: Paper Analysis LLM
         type: llm
@@ -318,8 +322,8 @@ workflow:
           completion_params:
             temperature: 0.7
           mode: chat
-          name: gemini-2.5-pro
-          provider: langgenius/gemini/google
+          name: chatgpt-4o-latest
+          provider: langgenius/openai/openai
         prompt_template:
         - id: ceb640be-2331-4714-9daf-e15281316498
           role: system
@@ -355,8 +359,8 @@ workflow:
             \  \n</analysis>  \n\nPlease output in the user-specified language: {{#1750313008999.language#}}."
         - id: b87b542f-b53e-4efb-a30e-d23af5c03442
           role: user
-          text: '{{#sys.query#}}'
-        selected: false
+          text: Perform your job and output in {{#1750313008999.language#}}.
+        selected: true
         title: Related Paper LLM
         type: llm
         variables: []
@@ -370,7 +374,7 @@ workflow:
       positionAbsolute:
         x: 1891
         y: 282
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -945,6 +949,6 @@ workflow:
       type: custom
       width: 244
     viewport:
-      x: -25.099651000320023
-      y: 231.8026064699343
-      zoom: 0.32987697769322366
+      x: -348.70460667424595
+      y: 67.1107185390996
+      zoom: 0.574349177498518

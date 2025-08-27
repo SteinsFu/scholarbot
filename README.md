@@ -4,7 +4,20 @@
 
 ### Method 1: Use the Dify Online Service
 1. Go to https://cloud.dify.ai/apps and register an account.
-2. Import the Boost Papers Agent:
+2. Setup Dify (Plugins and API keys):
+    1. Go to the "Settings" tab in Dify.
+    2. Download plugins and configure settings:
+       1. Click "Plugins" on the top-right corner
+       2. Search and download the following plugins:
+          - `Jina AI`
+          - `Gemini`
+          - `OpenAI`
+          - `Slack Bot`
+    3. For Gemeni or OpenAI, go to "Settings" > "Model Provider" and enter your API key by clicking the "API-KEY" Setup button.
+    4. For other plugins requiring API keys (e.g. Jina AI)
+       1. Obtain your API key from your service (e.g. https://jina.ai/)
+       2. In Dify, go to "Plugin" and click your plugin (e.g. Jina AI), and enter your api key in the Authorization field. 
+3. Import the Boost Papers Agent:
     1. Go to the "Studio" tab in Dify.
     2. Click on "Import DSL file" and upload the `dify_dsl/boost-papers-agent.yaml` file from this repository.
 
@@ -27,10 +40,19 @@
     1. Open your web browser and go to `http://localhost` to access the Dify web interface.
         - Or if you are running Dify on a remote server, replace `localhost` with the server's IP address or domain name.
     2. Create an account and log in.
-4. Setup Dify:
+4. Setup Dify (Plugins and API keys):
     1. Go to the "Settings" tab in Dify.
-    2. Install the OpenAI plugin and enter your API key by clicking the "API-KEY" Setup button.
-    3. Download or configure any other models and settings as needed.
+    2. Download plugins and configure settings:
+       1. Click "Plugins" on the top-right corner
+       2. Search and download the following plugins:
+          - `Jina AI`
+          - `Gemini`
+          - `OpenAI`
+          - `Slack Bot`
+    3. For Gemeni or OpenAI, go to "Settings" > "Model Provider" and enter your API key by clicking the "API-KEY" Setup button.
+    4. For other plugins requiring API keys (e.g. Jina AI)
+       1. Obtain your API key from your service (e.g. https://jina.ai/)
+       2. In Dify, go to "Plugin" and click your plugin (e.g. Jina AI), and enter your api key in the Authorization field. 
 5. Import the Boost Papers Agent:
     1. Go to the "Studio" tab in Dify.
     2. Click on "Import DSL file" and upload the `dify_dsl/boost-papers-agent.yaml` file from this repository.
