@@ -27,8 +27,21 @@
     1. Go to the "Studio" tab in Dify.
     2. Click on "Import DSL file" and upload the `dify_dsl/boost-papers-agent.yaml` file from this repository.
 
-## Development of the Dify DSL
-(In progress...)
+## Development 
+
+### Dify Workflow
+- [x] Accept pdf url as input
+- [x] Accept pdf file as input
+- [x] Extract text from pdf url
+- [x] Extract text from pdf file
+- [x] Instruct LLM to summarize paper
+- [x] Instruct LLM to find related papers
+- [ ] Slack integration (require AWS or GCP)
+
+### Others
+- [ ] (in progress...) PDF embeddings visualization
+
+*← Feel free to add any TODOs...*
 
 
 
