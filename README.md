@@ -46,7 +46,7 @@
 
 
 
-## PDF Correlator (3D Visualization)
+## PDF embeddings visualization (in progress...)
 
 Create an interactive 3D visualization of how a set of PDFs are semantically correlated using sentence embeddings (PyTorch).
 
