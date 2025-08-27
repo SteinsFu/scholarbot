@@ -1,6 +1,14 @@
 # Boost Papers Agent
 
 ## Setup
+
+### Method 1: Use the Dify Online Service
+1. Go to https://cloud.dify.ai/apps and register an account.
+2. Import the Boost Papers Agent:
+    1. Go to the "Studio" tab in Dify.
+    2. Click on "Import DSL file" and upload the `dify_dsl/boost-papers-agent.yaml` file from this repository.
+
+### Method 2: Setup Local Dify Server (or Deploy to Cloud)
 1. Install Docker:
     - For Ubuntu, you can follow the official Docker installation guide: [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/).
     - For MacOS/Windows, you can download Docker Desktop from [Docker Hub](https://www.docker.com/products/docker-desktop).
