@@ -87,6 +87,17 @@ Return a ranked list of the related papers. For each paper, include:
 - **Explanation:** A concise description of why it is relevant and how it relates to the target paper.  
 - **Justification for Ranking:** Why it was placed in this position according to the ranking criteria.  
 
+At the end, output a **Final Ranking Summary** like the following:
+**Final Ranking Summary**
+1. ✅ Paper 1 – brief reason why it is relevant
+2. ✅ Paper 2 - brief reason why it is relevant
+3. ✅ Paper 3 - brief reason why it is relevant
+4. 🔁 Paper 4 - brief reason why it is less relevant
+5. 🔁 Paper 5 - brief reason why it is less relevant
+6. ❌ Paper 6 - brief reason why it is not relevant
+7. ❌ Paper 7 - brief reason why it is not relevant
+...
+
 ## Inputs:
 Paper content:  
 <paper>  
