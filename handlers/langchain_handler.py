@@ -83,7 +83,7 @@ Rank the related papers in descending order of relevance to the target paper usi
 
 Return a ranked list of the related papers. For each paper, include:  
 
-- **Title**  
+- **Title** (linked to the paper's URL) 
 - **Explanation:** A concise description of why it is relevant and how it relates to the target paper.  
 - **Justification for Ranking:** Why it was placed in this position according to the ranking criteria.  
 

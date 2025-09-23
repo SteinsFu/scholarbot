@@ -83,13 +83,13 @@ python app.py
 - [x] PDF URL input processing
 - [x] PDF file upload support (via Slack)
 - [x] Text extraction from PDFs
-- [x] LLM-powered paper summarization (GPT-4)
+- [x] LLM-powered paper summarization
 - [x] Related paper discovery (Semantic Scholar API)
 - [x] Slack integration with Socket Mode
 - [x] Multi-language support and auto-detection
 - [x] Memory-aware conversations with thread management
+- [x] File upload support (beyond URLs)
 - [ ] Enhanced error handling and validation
-- [ ] File upload support (beyond URLs)
 - [ ] Deploy to AWS/GCP
 - [ ] Web interface alternative to Slack
 - [ ] Batch processing of multiple papers

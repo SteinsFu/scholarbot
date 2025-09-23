@@ -19,7 +19,7 @@ app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 bot_user_id = app.client.auth_test()["user_id"]
 langchain_handler = LangChainHandler()
 
-chat_threads = {}   # {user_id: {thread_id: thread_id, pdf_url: pdf_url}}
+chat_threads = {}   # {user_id: {thread_id: thread_id, current_pdf: pdf_url or pdf_file_id}}
 
 lang_maps = {
     'ja': 'Japanese',
@@ -43,10 +43,44 @@ def parse_event(event):
     query = re.sub(url_pattern, '', query_raw).strip()
     query = ' '.join(query.split())
     
-    pdf_file = None                                         # TODO: implement this
+    # Check for file uploads
+    pdf_file = None
+    if 'files' in event and event['files']:
+        # Look for PDF files in the uploads
+        for file_info in event['files']:
+            if file_info.get('mimetype') == 'application/pdf' or file_info.get('name', '').lower().endswith('.pdf'):
+                pdf_file = file_info
+                break
+    
     language_code = detect(query) if query else 'en'
     language = lang_maps.get(language_code, 'English')
     return query, pdf_url, pdf_file, language
+
+
+def download_slack_file(file_info, app_client):
+    """
+    Download file content from Slack
+    
+    Args:
+        file_info: Slack file information dict
+        app_client: Slack app client for API calls
+        
+    Returns:
+        bytes: File content as bytes
+    """
+    try:
+        # Get file info with download URL
+        file_response = app_client.files_info(file=file_info['id'])
+        file_data = file_response['file']
+        
+        # Download the file content
+        headers = {'Authorization': f'Bearer {os.environ.get("SLACK_BOT_TOKEN")}'}
+        response = requests.get(file_data['url_private_download'], headers=headers)
+        response.raise_for_status()
+        
+        return response.content
+    except Exception as e:
+        raise Exception(f"Failed to download file from Slack: {str(e)}")
 
 
 def markdown_to_slack(text):
@@ -75,11 +109,12 @@ def handle_app_mention(event, say):
         
         # 0. Check if the user has a thread id
         user_id = event['user']
-        is_new_paper = pdf_url != '' and pdf_url != chat_threads.get(user_id, {}).get('pdf_url', '')
+        prev_pdf = chat_threads.get(user_id, {}).get('current_pdf', '')
+        is_new_paper = pdf_url != '' and pdf_url != prev_pdf or pdf_file is not None and pdf_file['id'] != prev_pdf
         if '/new' in query or user_id not in chat_threads:
             is_new_paper = True
             thread_id = user_id + pdf_url
-            chat_threads[user_id] = {'thread_id': thread_id, 'pdf_url': pdf_url}
+            chat_threads[user_id] = {'thread_id': thread_id, 'current_pdf': pdf_file['id'] if pdf_file else pdf_url}
             print(f"Starting new thread {thread_id}...")
             say("🆕 _Starting a new conversation..._ \nℹ️ _(Type '/new' after mentioning me to start a new conversation)_")
         else:
@@ -89,39 +124,75 @@ def handle_app_mention(event, say):
         
         if is_new_paper:
             say("⏳ Processing the paper...")
-            # 1. Get the paper meta and related papers from Semantic Scholar
+            
+            # Define helper variables for readability
+            has_pdf_url = pdf_url != ''
+            has_pdf_file = pdf_file is not None
+            
+            # 1. Fetch the text using JINA API (either from URL or uploaded file)
             try:
-                semantic_scholar = SemanticScholarHandler()
-                paper_meta = semantic_scholar.get_paper(pdf_url)
-                related_papers = semantic_scholar.get_recommendations(paper_meta['paperId'])
-                related_papers_text = parse_related_papers(related_papers)
-                related_papers_text = markdown_to_slack(related_papers_text)
+                jina_handler = JinaHandler()
+                if has_pdf_file:
+                    # Handle uploaded file
+                    say("📥 Processing uploaded PDF file...")
+                    pdf_content = download_slack_file(pdf_file, app.client)
+                    text = jina_handler.fetch_pdf_file(pdf_content)
+                elif has_pdf_url:
+                    # Handle URL
+                    text = jina_handler.fetch_url(pdf_url)
+                else:
+                    say("❌ Error: No PDF file or URL provided")
+                    return
             except Exception as e:
                 say(f"❌ Error: {e}")
                 return
             
-            # 2. Fetch the text from the url using JINA API
+            # 2. Get the paper meta and related papers from Semantic Scholar (only for URLs)xt            paper_meta = None
+            related_papers_text = ""
             try:
-                jina_handler = JinaHandler()
-                text = jina_handler.fetch_url(pdf_url)
+                if has_pdf_url:
+                    semantic_scholar = SemanticScholarHandler()
+                    paper_meta = semantic_scholar.get_paper(pdf_url)
+                    related_papers = semantic_scholar.get_recommendations(paper_meta['paperId'])
+                    related_papers_text = parse_related_papers(related_papers)
+                    related_papers_text = markdown_to_slack(related_papers_text)
+                elif has_pdf_file:
+                    # get first # title from the markdown text
+                    title = re.search(r'^#+\s*(.*?)$', text, re.MULTILINE).group(1)
+                    semantic_scholar = SemanticScholarHandler()
+                    paper_meta = semantic_scholar.search_paper(title)
+                    related_papers = semantic_scholar.get_recommendations(paper_meta['paperId'])
+                    related_papers_text = parse_related_papers(related_papers)
+                    related_papers_text = markdown_to_slack(related_papers_text)
+                else:
+                    say("❌ Error: No PDF file or URL provided")
+                    return
             except Exception as e:
-                say(f"❌ Error: {e}")
-                return
+                say(f"⚠️ Warning: Could not fetch related papers from Semantic Scholar: {e}")
+                # Continue processing without related papers
             
             # 3. Optimize the text using TextOptimizer
             try:
                 text_optimizer = TextOptimizer()
                 optimized_result = text_optimizer.optimize_markdown(text, token_limit=4000)
                 text_optimizer.display_optimization_results(optimized_result)
-                paper_meta_text = f"Title: {paper_meta['title']}\nAuthors: {', '.join(author['name'] for author in paper_meta['authors'])}"
-                context = optimized_result["text"]
-                context = f"{paper_meta_text}\n\n{context}"
+                
+                # Add paper metadata if available
+                if paper_meta:
+                    paper_meta_text = f"Title: {paper_meta['title']}\nAuthors: {', '.join(author['name'] for author in paper_meta['authors'])}"
+                    context = f"{paper_meta_text}\n\n{optimized_result['text']}"
+                else:
+                    # For uploaded files without metadata
+                    filename = pdf_file.get('name', 'Uploaded PDF') if has_pdf_file else 'PDF Document'
+                    paper_meta_text = f"Document: {filename}"
+                    context = f"{paper_meta_text}\n\n{optimized_result['text']}"
             except Exception as e:
                 say(f"❌ Error: {e}")
                 return
             
             # 4. Summarize the paper using LangChain
             try:
+                say("🤖 Generating AI Summary...")
                 summary = langchain_handler.summarize_paper(query, thread_id=thread_id, context=context, language=language)
                 summary = "# 📄 Summary \n\n────────── \n\n" + summary + "\n\n────────── \n\n"
                 summary = markdown_to_slack(summary)
@@ -129,17 +200,20 @@ def handle_app_mention(event, say):
                 say(f"❌ Error: {e}")
                 return
             
-            # 5. Digest and rank the related papers using LangChain
-            try:
-                paper_meta_text = f"{paper_meta_text}\nAbstract: {paper_meta['abstract']}"
-                related_papers_text = langchain_handler.rank_related_papers(thread_id=thread_id, main_paper=paper_meta_text, related_papers=related_papers_text, language=language)
-                related_papers_text = "# 📚 Related Papers \n\n────────── \n\n" + related_papers_text + "\n\n────────── \n\n"
-                related_papers_text = markdown_to_slack(related_papers_text)
-            except Exception as e:
-                say(f"❌ Error: {e}")
-                return
+            # 5. Digest and rank the related papers using LangChain (only if we have related papers)
+            if related_papers_text and paper_meta:
+                try:
+                    say("🤖 Ranking Related Papers...")
+                    paper_meta_full = f"{paper_meta_text}\nAbstract: {paper_meta['abstract']}"
+                    related_papers_text = langchain_handler.rank_related_papers(thread_id=thread_id, main_paper=paper_meta_full, related_papers=related_papers_text, language=language)
+                    related_papers_text = "# 📚 Related Papers \n\n────────── \n\n" + related_papers_text + "\n\n────────── \n\n"
+                    related_papers_text = markdown_to_slack(related_papers_text)
+                except Exception as e:
+                    say(f"⚠️ Warning: Could not process related papers: {e}")
+                    related_papers_text = ""
             
             # 6. Output the summary and related papers
+            say("✅ Analysis Complete!")
             say(summary)
             say(related_papers_text)
         else:

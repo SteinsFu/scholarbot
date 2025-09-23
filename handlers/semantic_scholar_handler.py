@@ -7,6 +7,7 @@ from urllib3 import response
 
 class SemanticScholarHandler:
     def __init__(self):
+        self.search_url = "https://api.semanticscholar.org/graph/v1/paper/search/match"
         self.paper_url = "https://api.semanticscholar.org/graph/v1/paper/"
         self.recommendations_url = "https://api.semanticscholar.org/recommendations/v1/papers"
         self.fields = "paperId"
@@ -63,6 +64,15 @@ class SemanticScholarHandler:
             return f"ArXiv:{match.group(1)}"
         
         return None
+
+
+    def search_paper(self, query: str):
+        fields = "paperId,title,year,authors,abstract"
+        url = f"{self.search_url}?query={query}&fields={fields}"
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()
+        return data.get('data', [])[0]
 
 
     def get_paper(self, url: str):
