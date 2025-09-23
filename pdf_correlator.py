@@ -12,6 +12,22 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
 
+"""
+This module is not used currently.
+### Usage
+
+**Generate Embeddings:**
+```bash
+python pdf_correlator.py
+```
+
+**Visualize Results:**
+```bash
+tensorboard --logdir tensorboard_logs
+```
+"""
+
+
 
 # TODO: remove this temporary list
 PDF_LIST = {

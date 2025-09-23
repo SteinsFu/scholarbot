@@ -1,114 +1,98 @@
-# Boost Papers Agent
+# ScholarBot
 
 **🌐 Language | 言語:** **English** | [日本語](README_JP.md)
 
 > **Note:** This English version contains the most accurate and up-to-date information.
 
-A powerful AI agent for analyzing academic papers, extracting insights, and discovering related research using advanced language models and PDF processing capabilities.
+A powerful AI bot for analyzing academic papers, extracting insights, and discovering related research using advanced language models and PDF processing capabilities. Built with LangChain, OpenAI, and Slack Bot integration.
 
 ## 🚀 Features
 
 - **PDF Processing**: Extract and analyze text from PDF files and URLs
-- **AI-Powered Summarization**: Generate comprehensive paper summaries using state-of-the-art LLMs
-- **Related Paper Discovery**: Find semantically similar research papers
+- **AI-Powered Summarization**: Generate comprehensive paper summaries using state-of-the-art LLMs (GPT-4)
+- **Related Paper Discovery**: Find semantically similar research papers using Semantic Scholar API
 - **Slack Integration**: Seamless integration with Slack for team collaboration
-- **3D Visualization**: Interactive visualization of paper embeddings and correlations
-- More...?
+- **Multi-language Support**: Automatic language detection and response in user's language
+- **Memory-Aware Conversations**: Context-aware follow-up questions and discussions
 
 ## 🛠️ Setup
 
-### Option 1: Dify Cloud Service (Recommended)
+### Prerequisites
 
-1. **Create Account**
-   - Visit [Dify Cloud](https://cloud.dify.ai/apps) and register an account
-
-2. **Configure Plugins**
-   - Navigate to **Settings** → **Plugins**
-   - Install the following plugins:
-     - `Jina AI`
-     - `Gemini` 
-     - `OpenAI`
-     - `Slack Bot`
-
-3. **Setup API Keys**
-   - **OpenAI/Gemini**: Go to **Settings** → **Model Provider** and enter your API key
-   - **Jina AI**: Obtain API key from [jina.ai](https://jina.ai/), then configure in the plugin's Authorization field
-
-4. **Import Agent**
-   - Go to **Studio** tab
-   - Click **Import DSL file** and upload `dify_dsl/boost-papers-agent.yaml`
-
-### Option 2: Local Dify Server
-
-1. **Install Docker**
-   - **Ubuntu**: Follow [Docker Engine installation guide](https://docs.docker.com/engine/install/ubuntu/)
-   - **macOS/Windows**: Download [Docker Desktop](https://www.docker.com/products/docker-desktop)
-
-2. **Deploy Dify**
+1. **Python Environment**
    ```bash
-   git clone https://github.com/langgenius/dify.git
-   cd dify/docker
-   cp .env.example .env
-   sudo docker compose up -d
+   conda create -n scholarbot python=3.12
+   conda activate scholarbot
+   pip install -r requirements.txt
    ```
 
-3. **Access & Configure**
-   - Open `http://localhost` in your browser
-   - Create account and follow steps 2-4 from Option 1 above
+2. **API Keys Required**
+   - **OpenAI API Key**: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+   - **Jina AI API Key**: Get from [Jina AI](https://jina.ai/)
+   - **Slack Bot Token**: Create a Slack app and get bot token
+   - **Slack App Token**: Enable Socket Mode and get app-level token
 
-## 🎯 Dify App Usage
+### Configuration
 
-Once you've completed the setup:
+1. **Environment Variables**
+   Create a `.env` file in the project root:
+   ```bash
+   OPENAI_API_KEY=your_openai_api_key
+   JINA_API_KEY=your_jina_api_key
+   SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
+   SLACK_APP_TOKEN=xapp-your-slack-app-token
+   LANGCHAIN_API_KEY=your_langchain_api_key  # Optional for tracing
+   ```
 
-1. **Publish the App**
-   - In Dify, click the **Publish** button
-   - Configure your publishing settings as needed
-   - Confirm the publication
+2. **Slack App Setup**
+   - Create a new Slack app at [api.slack.com](https://api.slack.com/apps)
+   - Enable Socket Mode
+   - Add Bot Token Scopes: `app_mentions:read`, `chat:write`, `files:read`
+   - Install the app to your workspace
+   - Copy the Bot User OAuth Token and App-Level Token
 
-2. **Start Using the Agent**
-   - Click **Run App** to open the chat interface
-   - Upload a PDF file or provide a PDF URL
-   - Ask questions about the paper or request summaries
-   - Discover related research papers
+## 🚀 Usage
+
+### Running the Slack Bot
+
+```bash
+python app.py
+```
+
+### Using the Agent
+
+1. **Mention the bot in Slack**
+   - `@YourBot https://arxiv.org/pdf/2301.00000.pdf Summarize this paper`
+   - `@YourBot Can you find related papers to the one I just shared?`
+   - `@YourBot /new Let's start a new conversation`
+
+2. **Supported Commands**
+   - Share a PDF URL with any question
+   - Ask for paper summaries
+   - Request related paper discovery
+   - Follow-up questions about previously analyzed papers
+
+### Features in Action
+
+- **Automatic Language Detection**: The bot responds in the same language as your query
+- **Context Memory**: Each user has their own conversation thread for follow-up questions
+- **Rich Responses**: Well-formatted paper summaries and related paper rankings
 
 ## 📋 Development Status
 
 - [x] PDF URL input processing
-- [x] PDF file upload support
+- [x] PDF file upload support (via Slack)
 - [x] Text extraction from PDFs
-- [x] LLM-powered paper summarization
-- [x] Related paper discovery
-- [ ] Allow follow-up questions about the paper
+- [x] LLM-powered paper summarization (GPT-4)
+- [x] Related paper discovery (Semantic Scholar API)
+- [x] Slack integration with Socket Mode
+- [x] Multi-language support and auto-detection
+- [x] Memory-aware conversations with thread management
+- [ ] Enhanced error handling and validation
+- [ ] File upload support (beyond URLs)
 - [ ] Deploy to AWS/GCP
-- [ ] Slack integration (might need AWS/GCP setup)
-- [ ] PDF embeddings visualization
-- [ ] Enhanced error handling
-- [ ] Use Python to discover related papers instead?
-
-*Feel free to contribute by adding more features!*
-
-## 🔬 PDF Embeddings Visualization
-
-*Work in progress: Interactive 3D visualization of PDF semantic correlations using PyTorch sentence embeddings.*
-
-### Prerequisites
-```bash
-conda create -n boost-proj python=3.12
-conda activate boost-proj
-pip install -r requirements.txt
-```
-
-### Usage
-
-**Generate Embeddings:**
-```bash
-python pdf_correlator.py
-```
-
-**Visualize Results:**
-```bash
-tensorboard --logdir tensorboard_logs
-```
+- [ ] Web interface alternative to Slack
+- [ ] Batch processing of multiple papers
 
 ## 🤝 Contributing
 
