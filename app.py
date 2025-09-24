@@ -204,7 +204,6 @@ def handle_app_mention(event, say):
             related_papers_text = ""
             try:
                 say("🌐 [2/5] Searching for related papers...")
-                raise Exception("Dummy error")
                 if has_pdf_url:
                     semantic_scholar = SemanticScholarHandler()
                     paper_meta = semantic_scholar.get_paper(pdf_url)
