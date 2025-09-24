@@ -27,20 +27,33 @@ A powerful AI bot for analyzing academic papers, extracting insights, and discov
    ```
 
 2. **API Keys Required**
-   - **OpenAI API Key**: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
-   - **Jina AI API Key**: Get from [Jina AI](https://jina.ai/)
-   - **Slack Bot Token**: Create a Slack app and get bot token
-   - **Slack App Token**: Enable Socket Mode and get app-level token
+   
+   **Essential Keys (Required for basic functionality):**
+   - **Jina AI API Key**: Get from [Jina AI](https://jina.ai/) - Required for PDF text extraction
+   - **Slack Bot Token**: Create a Slack app and get bot token - Required for Slack integration  
+   - **Slack App Token**: Enable Socket Mode and get app-level token - Required for Slack integration
+   
+    **LLM Provider Keys (Choose at least one):**
+    - **OpenAI API Key**: Get from [OpenAI Platform](https://platform.openai.com/api-keys) - For GPT-4 models
+    - **Google Gemini API Key**: Get from [Google AI Studio](https://aistudio.google.com/) - For Gemini models
+    - **Google Cloud Credentials**: For Vertex AI access - Download service account JSON from [Google Cloud Console](https://console.cloud.google.com/)
+    - **Anthropic API Key**: Get from [Anthropic Console](https://console.anthropic.com/) - For Claude models
+   
+   **Optional Keys:**
+   - **LangChain API Key**: Get from [LangChain](https://smith.langchain.com/) - For conversation tracing and debugging
 
 ### Configuration
 
 1. **Environment Variables**
    Create a `.env` file in the project root:
    ```bash
-   OPENAI_API_KEY=your_openai_api_key
-   JINA_API_KEY=your_jina_api_key
    SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
    SLACK_APP_TOKEN=xapp-your-slack-app-token
+   JINA_API_KEY=your_jina_api_key
+   OPENAI_API_KEY=your_openai_api_key  # If you want to use OpenAI
+   GOOGLE_API_KEY=your_gemini_api_key  # If you want to use Google Gemini API
+   GOOGLE_APPLICATION_CREDENTIALS=path_to_your_vertexai_credential_json # If you want to use Google VertexAI API
+   ANTHROPIC_API_KEY=your_anthropic_api_key  # If you want to use Anthropic API
    LANGCHAIN_API_KEY=your_langchain_api_key  # Optional for tracing
    ```
 
@@ -61,13 +74,14 @@ python app.py
 
 ### Using the Agent
 
-1. **Mention the bot in Slack**
-   - `@YourBot https://arxiv.org/pdf/2301.00000.pdf Summarize this paper`
-   - `@YourBot Can you find related papers to the one I just shared?`
-   - `@YourBot /new Let's start a new conversation`
+1. **Available Commands**
+   - `@YourBot https://arxiv.org/pdf/2301.00000.pdf Summarize this paper` - Analyze and summarize any PDF paper
+   - `@YourBot Can you find related papers to the one I just shared?` - Discover similar research using Semantic Scholar
+   - `@YourBot /new Now summarize this paper https://...` - Start a fresh conversation (clears previous context)
+   - `@YourBot /select_llm_provider` - Choose your preferred LLM provider (ChatGPT, Google, ...)
 
 2. **Supported Commands**
-   - Share a PDF URL with any question
+   - Share a PDF URL / PDF file with any question
    - Ask for paper summaries
    - Request related paper discovery
    - Follow-up questions about previously analyzed papers
@@ -89,6 +103,7 @@ python app.py
 - [x] Multi-language support and auto-detection
 - [x] Memory-aware conversations with thread management
 - [x] File upload support (beyond URLs)
+- [x] Support different model providers
 - [ ] Enhanced error handling and validation
 - [ ] Deploy to AWS/GCP
 - [ ] Web interface alternative to Slack

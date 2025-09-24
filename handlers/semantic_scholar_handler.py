@@ -101,7 +101,18 @@ class SemanticScholarHandler:
         return data.get("recommendedPapers", [])[:limit]
     
     @staticmethod
-    def parse_related_papers_with_url(related_papers):
+    def parse_related_papers_simple(related_papers):
+        related_papers_text = "────────── \n\n# 📚 Related Papers \n\n────────── \n\n"
+        for paper in related_papers:
+            related_papers_text += f"## [{paper['title']}]({paper['url']}) \n"
+            related_papers_text += f"- Authors: {', '.join(author['name'] for author in paper['authors'])}\n"
+            related_papers_text += f"- Year: {paper['year']}\n"
+            related_papers_text += f"- Abstract: {paper['abstract']}\n"
+            related_papers_text += "\n────────── \n\n"
+        return related_papers_text
+
+    @staticmethod
+    def parse_related_papers_detailed(related_papers):
         """
         Generate a summary text including titles and URLs for related papers.
         
