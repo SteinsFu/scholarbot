@@ -99,3 +99,26 @@ class SemanticScholarHandler:
         response = requests.post(self.recommendations_url, params={"fields": "title,year,url,authors,abstract,publicationVenue"}, json=body)
         data = response.json()
         return data.get("recommendedPapers", [])[:limit]
+    
+    @staticmethod
+    def parse_related_papers_with_url(related_papers):
+        """
+        Generate a summary text including titles and URLs for related papers.
+        
+        Args:
+            recommended_papers (list): List of paper dicts from Semantic Scholar recommendations.
+            
+        Returns:
+            str: Markdown-formatted string with title, year, and URL for each paper.
+        """
+        parsed_papers = []
+        for paper in related_papers:
+            title = paper.get("title", "No title")
+            url = paper.get("url", "No URL")
+            year = paper.get("year", "No year")
+            authors = ", ".join([author.get("name", "") for author in paper.get("authors", [])])
+            abstract = paper.get("abstract", "No abstract")
+            venue = paper.get("publicationVenue", {})
+            venue_name = venue.get("name", "No venue") if venue else "No venue"
+            parsed_papers.append(f"- {title} ({year}) by {authors}. Published in {venue_name}. URL: {url}\n  Abstract: {abstract}")
+        return "\n".join(parsed_papers)
