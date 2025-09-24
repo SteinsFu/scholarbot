@@ -103,6 +103,8 @@ def parse_related_papers(related_papers):
 
 @app.event("app_mention")
 def handle_app_mention(event, say):
+    print("Received event:", event)   # ターミナルに出力
+    say("✅ メッセージを受け取りました！")  # Slack に返事
     print(event)
     if event and 'text' in event:
         query, pdf_url, pdf_file, language = parse_event(event)
@@ -154,7 +156,7 @@ def handle_app_mention(event, say):
                     semantic_scholar = SemanticScholarHandler()
                     paper_meta = semantic_scholar.get_paper(pdf_url)
                     related_papers = semantic_scholar.get_recommendations(paper_meta['paperId'])
-                    related_papers_text = parse_related_papers(related_papers)
+                    related_papers_text = SemanticScholarHandler.parse_related_papers_with_url(related_papers)
                     related_papers_text = markdown_to_slack(related_papers_text)
                 elif has_pdf_file:
                     # get first # title from the markdown text
@@ -162,7 +164,7 @@ def handle_app_mention(event, say):
                     semantic_scholar = SemanticScholarHandler()
                     paper_meta = semantic_scholar.search_paper(title)
                     related_papers = semantic_scholar.get_recommendations(paper_meta['paperId'])
-                    related_papers_text = parse_related_papers(related_papers)
+                    related_papers_text = SemanticScholarHandler.parse_related_papers_with_url(related_papers)
                     related_papers_text = markdown_to_slack(related_papers_text)
                 else:
                     say("❌ Error: No PDF file or URL provided")
