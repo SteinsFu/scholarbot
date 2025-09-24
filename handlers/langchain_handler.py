@@ -1,5 +1,7 @@
 import os
 import time
+import vertexai
+import google.generativeai as genai
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from langgraph.checkpoint.memory import MemorySaver
@@ -124,7 +126,12 @@ class LangChainHandler:
     def __init__(self):
         load_dotenv()
         os.environ["LANGCHAIN_TRACING"] = "true"    # Enable LangChain tracing
-        self.model = init_chat_model("chatgpt-4o-latest", model_provider="openai")
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "/Users/momoka_furuhashi/work/2025_inui/tu-vertex-ai-prod-2fd3bb917540.json" ## Your creadit path
+        # self.model = init_chat_model("chatgpt-4o-latest", model_provider="openai")
+        ### geminiに対応
+        gemini_model = genai.GenerativeModel("models/gemini-2.5-flash")
+        self.model = gemini_model
+        
         self.app = self.init_app_with_memory()
 
     def init_app_with_memory(self):
@@ -137,8 +144,11 @@ class LangChainHandler:
         # create a function to call the model
         def call_model(state: MessagesState):
             prompt = prompt_template.invoke(state)  # create the prompt
-            response = self.model.invoke(prompt)    # call the model
-            return {"messages": response}
+            # response = self.model.invoke(prompt)    # call the model
+            # return {"messages": response}
+            response = self.model.generate_content(prompt) # geminiに対応
+            return {"messages": [AIMessage(content=response.text)]}  # geminiに対応
+        
         # create a workflow
         workflow = StateGraph(state_schema=MessagesState)
         workflow.add_node("model", call_model)          # create a node
