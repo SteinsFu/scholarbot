@@ -114,18 +114,39 @@ Please output in the user-specified language: {{language}}.
 
 
 
-# class State(TypedDict):
-#     messages: Annotated[Sequence[BaseMessage], add_messages]
-#     context: str
-#     language: str
-
-
 class LangChainHandler:
     def __init__(self):
         load_dotenv()
-        os.environ["LANGCHAIN_TRACING"] = "true"    # Enable LangChain tracing
-        self.model = init_chat_model("chatgpt-4o-latest", model_provider="openai")
+        os.environ["LANGSMITH_TRACING"] = "true"    # Enable LangChain tracing
+        self.set_model(self.available_providers[0]) # set the first available provider
         self.app = self.init_app_with_memory()
+
+    @property
+    def available_providers(self):
+        available_providers = []
+        if os.environ.get("OPENAI_API_KEY"):
+            available_providers.append("OpenAI")
+        if os.environ.get("GOOGLE_API_KEY"):
+            available_providers.append("Google Gemini")
+        if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+            available_providers.append("GoogleVertexAI")
+        if os.environ.get("ANTHROPIC_API_KEY"):
+            available_providers.append("Anthropic")
+        if not available_providers:
+            available_providers.append(None)
+        return available_providers
+
+    def set_model(self, provider: str):
+        if not provider:
+            raise ValueError("Please at least set one API keys in the .env file: [OPENAI_API_KEY, GOOGLE_API_KEY, GOOGLE_APPLICATION_CREDENTIALS, ANTHROPIC_API_KEY]")
+        if provider == "OpenAI":
+            self.model = init_chat_model("chatgpt-4o-latest", model_provider="openai")
+        elif provider == "Google Gemini":
+            self.model = init_chat_model("gemini-2.5-flash", model_provider="google_genai")
+        elif provider == "Google VertexAI":
+            self.model = init_chat_model("gemini-2.5-flash", model_provider="google_vertexai")
+        elif provider == "Anthropic":
+            self.model = init_chat_model("claude-3-7-sonnet-20250219", model_provider="anthropic")
 
     def init_app_with_memory(self):
         prompt_template = ChatPromptTemplate.from_messages(
