@@ -99,6 +99,18 @@ def parse_event(event):
     return query, pdf_url, pdf_file, language
 
 
+def parse_selected_provider(text: str) -> str:
+    """
+    Slackメッセージから選択されたLLMプロバイダを抽出する
+    例: "/select_llm_provider Google Gemini" -> "Google Gemini"
+    """
+    parts = text.strip().split()
+    if len(parts) >= 2:
+        return " ".join(parts[1:])
+    else:
+        return ""  # 不正な形式の場合
+
+
 def download_slack_file(file_info, app_client):
     """
     Download file content from Slack
@@ -151,6 +163,9 @@ def handle_llm_provider_confirm(ack, body, say):
 
 @app.event("app_mention")
 def handle_app_mention(event, say):
+    global current_llm_provider
+    langchain_handler.ensure_model(current_llm_provider)
+    langchain_handler.app = langchain_handler.init_app_with_memory()
     print(f"Received event: {event}")
     print(f"chat_threads: {chat_threads}")
     if event and 'text' in event:
@@ -158,6 +173,14 @@ def handle_app_mention(event, say):
         if "/select_llm_provider" in event['text']:
             say(blocks=llm_provider_menu_blocks, text="Choose a LLM provider:")
             return
+        # if "/select_llm_provider" in event['text']:
+        #     selected_provider = parse_selected_provider(event['text'])
+        #     if selected_provider in langchain_handler.available_providers:
+        #         langchain_handler.set_model(selected_provider)
+        #         say(f"✅ LLM provider is now set to {selected_provider}")
+        #     else:
+        #         say(f"❌ Invalid provider. Available options: {', '.join(langchain_handler.available_providers)}")
+        #     return
         
         # 1. Parse query & check if the user has a thread id
         query, pdf_url, pdf_file, language = parse_event(event)
