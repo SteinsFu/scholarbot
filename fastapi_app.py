@@ -60,47 +60,8 @@ if not SLACK_SIGNING_SECRET:
     raise ValueError("SLACK_SIGNING_SECRET is required for webhook verification")
 
 
-# Language mapping for detection
-lang_maps = {
-    'ja': 'Japanese',
-    'en': 'English', 
-    'zh': 'Chinese',
-    # add more languages here
-}
-
-async def download_slack_file(file_info, app_client):
-    """
-    Download file content from Slack
-    
-    Args:
-        file_info: Slack file information dict
-        app_client: Async Slack app client for API calls
-        
-    Returns:
-        bytes: File content as bytes
-    """
-    try:
-        # Get file info with download URL
-        file_response = await app_client.files_info(file=file_info['id'])
-        file_data = file_response['file']
-        
-        # Download the file content
-        headers = {'Authorization': f'Bearer {SLACK_BOT_TOKEN}'}
-        import requests
-        response = requests.get(file_data['url_private_download'], headers=headers)
-        response.raise_for_status()
-        
-        return response.content
-    except Exception as e:
-        raise Exception(f"Failed to download file from Slack: {str(e)}")
-
-
-def markdown_to_slack(text):
-    """Convert markdown to Slack mrkdwn format."""
-    from markdown_to_mrkdwn import SlackMarkdownConverter
-    converter = SlackMarkdownConverter()
-    mrkdwn_text = converter.convert(text)
-    return mrkdwn_text
+# Note: Utility functions (lang_maps, download_slack_file, markdown_to_slack) 
+# moved to PaperProcessor to avoid code duplication
 
 
 def generate_llm_menu_blocks(user_id: str = None):
@@ -276,13 +237,6 @@ async def process_paper_request_async(event: Dict[str, Any], say):
         # Use the existing parse_request method (no duplication!)
         query, pdf_url, pdf_file, language = paper_processor.parse_request(text, files)
         
-        # Prepare file content if needed
-        pdf_file_content = None
-        pdf_filename = ""
-        if pdf_file:
-            pdf_file_content = await download_slack_file(pdf_file, slack_app.client)
-            pdf_filename = pdf_file.get('name', 'uploaded.pdf')
-        
         # Determine if this should be a new conversation
         force_new = '/new' in query or user_id not in paper_processor.chat_threads
         
@@ -296,15 +250,16 @@ async def process_paper_request_async(event: Dict[str, Any], say):
         async def async_progress_callback(message):
             await say(message)
         
-        # Use the existing process_paper method (no duplication!)
+        # Use the enhanced process_paper method that handles file download internally
         result = await paper_processor.process_paper(
             query=query,
             pdf_url=pdf_url,
-            pdf_file_content=pdf_file_content,
-            pdf_filename=pdf_filename,
             user_id=user_id,
             force_new=force_new,
-            progress_callback=async_progress_callback
+            progress_callback=async_progress_callback,
+            slack_file_info=pdf_file,
+            slack_client=slack_app.client,
+            bot_token=SLACK_BOT_TOKEN
         )
         
         # Handle results

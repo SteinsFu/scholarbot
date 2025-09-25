@@ -150,7 +150,8 @@ class PaperProcessor:
     
     async def process_paper(self, query: str, pdf_url: str = "", pdf_file_content: bytes = None, 
                            pdf_filename: str = "", user_id: str = "", force_new: bool = False, 
-                           progress_callback = None) -> Dict[str, Any]:
+                           progress_callback = None, slack_file_info = None, slack_client = None, 
+                           bot_token: str = "") -> Dict[str, Any]:
         """
         Process a paper and return analysis results.
         
@@ -163,6 +164,12 @@ class PaperProcessor:
         - error: error message if any
         """
         try:
+            # Handle Slack file download if needed
+            if slack_file_info and slack_client and bot_token and not pdf_file_content:
+                pdf_file_content = await self.download_slack_file(slack_file_info, slack_client, bot_token)
+                if not pdf_filename:
+                    pdf_filename = slack_file_info.get('name', 'uploaded.pdf')
+            
             # Determine if we have PDF content
             has_pdf_url = pdf_url != ''
             has_pdf_file = pdf_file_content is not None
@@ -308,3 +315,30 @@ class PaperProcessor:
         """Convert markdown to Slack-compatible format."""
         converter = SlackMarkdownConverter()
         return converter.convert(text)
+    
+    async def download_slack_file(self, file_info, slack_client, bot_token: str):
+        """
+        Download file content from Slack
+        
+        Args:
+            file_info: Slack file information dict
+            slack_client: Async Slack app client for API calls
+            bot_token: Slack bot token for authorization
+            
+        Returns:
+            bytes: File content as bytes
+        """
+        try:
+            # Get file info with download URL
+            file_response = await slack_client.files_info(file=file_info['id'])
+            file_data = file_response['file']
+            
+            # Download the file content
+            headers = {'Authorization': f'Bearer {bot_token}'}
+            import requests
+            response = requests.get(file_data['url_private_download'], headers=headers)
+            response.raise_for_status()
+            
+            return response.content
+        except Exception as e:
+            raise Exception(f"Failed to download file from Slack: {str(e)}")
