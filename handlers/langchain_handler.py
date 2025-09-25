@@ -129,24 +129,98 @@ class LangChainHandler:
         if os.environ.get("GOOGLE_API_KEY"):
             available_providers.append("Google Gemini")
         if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
-            available_providers.append("GoogleVertexAI")
+            available_providers.append("Google VertexAI")
         if os.environ.get("ANTHROPIC_API_KEY"):
             available_providers.append("Anthropic")
         if not available_providers:
             available_providers.append(None)
         return available_providers
 
-    def set_model(self, provider: str):
+    def list_available_models(self, provider: str):
+        """
+        Returns a list of common available models for the specified provider.
+        
+        Args:
+            provider (str): The provider name (e.g., "OpenAI", "Google Gemini", "Google VertexAI", "Anthropic")
+            
+        Returns:
+            list: A list of available model names for the provider
+            
+        Raises:
+            ValueError: If the provider is not supported or not available
+        """
+        # Check if provider is available (has API key configured)
+        if provider not in self.available_providers:
+            raise ValueError(f"Provider '{provider}' is not available. Available providers: {self.available_providers}")
+        openai_models = [
+            "chatgpt-4o-latest",
+            "gpt-3.5-turbo",
+            "gpt-4",
+            "gpt-4-turbo",
+            "gpt-4.1",
+            "gpt-4.1-mini",
+            "gpt-4.1-nano",
+            "gpt-4o",
+            "gpt-4o-mini",
+            "gpt-5",
+            "gpt-5-chat-latest",
+            "gpt-5-codex",
+            "gpt-5-mini",
+            "gpt-5-nano",
+        ]
+        gemini_models = [
+            "gemini-2.5-pro",
+            "gemini-2.5-flash",
+            "gemini-2.5-flash-lite",
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite",
+        ]
+        anthropic_models = [
+            "claude-opus-4-1-20250805",
+            "claude-opus-4-20250514",
+            "claude-sonnet-4-20250514",
+            "claude-3-7-sonnet-latest",
+            "claude-3-5-haiku-latest",
+            "claude-3-haiku-20240307",
+        ]
+        # Common models for each provider
+        provider_models = {
+            "OpenAI": openai_models,
+            "Google Gemini": gemini_models,
+            "Google VertexAI": gemini_models,
+            "Anthropic": anthropic_models,
+        }
+        return provider_models.get(provider, [])
+    
+    def get_default_model(self, provider: str):
+        if provider == "OpenAI":
+            return "chatgpt-4o-latest"
+        elif provider == "Google Gemini" or provider == "Google VertexAI":
+            return "gemini-2.5-flash"
+        elif provider == "Anthropic":
+            return "claude-3-7-sonnet-latest"
+        else:
+            return None
+
+    def set_model(self, provider: str, model: str = None):
         if not provider:
             raise ValueError("Please at least set one API keys in the .env file: [OPENAI_API_KEY, GOOGLE_API_KEY, GOOGLE_APPLICATION_CREDENTIALS, ANTHROPIC_API_KEY]")
+        
+        # Set default models if no specific model is provided [[memory:4396816]]
         if provider == "OpenAI":
-            self.model = init_chat_model("chatgpt-4o-latest", model_provider="openai")
+            model_provider = "openai"
         elif provider == "Google Gemini":
-            self.model = init_chat_model("gemini-2.5-flash", model_provider="google_genai")
+            model_provider = "google_genai"
         elif provider == "Google VertexAI":
-            self.model = init_chat_model("gemini-2.5-flash", model_provider="google_vertexai")
+            model_provider = "google_vertexai"
         elif provider == "Anthropic":
-            self.model = init_chat_model("claude-3-7-sonnet-20250219", model_provider="anthropic")
+            model_provider = "anthropic"
+        else:
+            raise ValueError(f"Unsupported provider: {provider}")
+        
+        # Use provided model or fall back to default
+        selected_model = model if model else self.get_default_model(provider)
+        self.model = init_chat_model(selected_model, model_provider=model_provider)
 
     def init_app_with_memory(self):
         prompt_template = ChatPromptTemplate.from_messages(

@@ -21,6 +21,7 @@ langchain_handler = LangChainHandler()
 
 chat_threads = {}   # {user_id: {thread_id: thread_id, current_pdf: pdf_url or pdf_file_id}}
 current_llm_provider = langchain_handler.available_providers[0]
+current_model = langchain_handler.get_default_model(current_llm_provider)
 
 lang_maps = {
     'ja': 'Japanese',
@@ -29,48 +30,92 @@ lang_maps = {
     # add more languages here
 }
 
-# LLM provider selector menu block
-llm_provider_menu_blocks = [
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "Select a LLM provider and then press confirm."
-        }
-    },
-    {
-        "type": "actions",
-        "elements": [
-            {
-                "type": "static_select",
-                "placeholder": {"type": "plain_text", "text": "Select a LLM provider", "emoji": True},
-                "options": [
-                    {
-                        "text": {"type": "plain_text", "text": provider},
-                        "value": provider
-                    }
-                    for provider in langchain_handler.available_providers
-                ],
-                "initial_option": {
-                    "text": {"type": "plain_text", "text": langchain_handler.available_providers[0]},
-                    "value": langchain_handler.available_providers[0]
-                },
-                "action_id": "llm_provider_select_action"
-            },
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Confirm",
-                    "emoji": True
-                },
-                "style": "primary",
-                "value": "confirm_button",
-                "action_id": "llm_provider_confirm_action"
+# Function to generate LLM provider and model selector menu blocks
+def generate_llm_menu_blocks():
+    global current_llm_provider, current_model
+    available_models = langchain_handler.list_available_models(current_llm_provider)
+    default_model = langchain_handler.get_default_model(current_llm_provider)
+    
+    # Create model options with "(recommended)" label for default model
+    model_options = []
+    if available_models:
+        for model in available_models:
+            display_text = model
+            if model == default_model:
+                display_text = f"{model} (recommended)"
+            model_options.append({
+                "text": {"type": "plain_text", "text": display_text},
+                "value": model
+            })
+    else:
+        model_options = [{"text": {"type": "plain_text", "text": "No models available"}, "value": "none"}]
+    
+    # Determine initial model selection - use current_model if set, otherwise use default
+    initial_model = current_model if current_model else default_model
+    
+    # Find the matching option text for the initial model
+    initial_option = None
+    if initial_model:
+        for option in model_options:
+            if option["value"] == initial_model:
+                initial_option = option
+                break
+    
+    # Fallback if no match found
+    if not initial_option and model_options and model_options[0]["value"] != "none":
+        initial_option = model_options[0]
+    
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Select a LLM provider and model, then press confirm."
             }
-        ]
-    }
-]
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "static_select",
+                    "placeholder": {"type": "plain_text", "text": "Select a LLM provider", "emoji": True},
+                    "options": [
+                        {
+                            "text": {"type": "plain_text", "text": provider},
+                            "value": provider
+                        }
+                        for provider in langchain_handler.available_providers
+                    ],
+                    "initial_option": {
+                        "text": {"type": "plain_text", "text": current_llm_provider},
+                        "value": current_llm_provider
+                    },
+                    "action_id": "llm_provider_select_action"
+                },
+                {
+                    "type": "static_select",
+                    "placeholder": {"type": "plain_text", "text": "Select a model", "emoji": True},
+                    "options": model_options,
+                    **({"initial_option": initial_option} if initial_option else {}),
+                    "action_id": "llm_model_select_action"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Confirm",
+                        "emoji": True
+                    },
+                    "style": "primary",
+                    "value": "confirm_button",
+                    "action_id": "llm_provider_confirm_action"
+                }
+            ]
+        }
+    ]
+
+# LLM provider and model selector menu blocks
+llm_provider_menu_blocks = generate_llm_menu_blocks()
 
 
 def parse_event(event):
@@ -135,17 +180,39 @@ def markdown_to_slack(text):
 
 @app.action("llm_provider_select_action")
 def handle_llm_provider_select(ack, body, say):
-    global current_llm_provider
+    global current_llm_provider, current_model, llm_provider_menu_blocks
     ack()  # Acknowledge the action
     selected_value = body["actions"][0]["selected_option"]["value"]
     current_llm_provider = selected_value
+    
+    # Update current model to default model for the new provider
+    current_model = langchain_handler.get_default_model(current_llm_provider)
+    
+    # Regenerate menu blocks and update the message
+    llm_provider_menu_blocks = generate_llm_menu_blocks()
+    
+    # Update the message with new menu blocks
+    app.client.chat_update(
+        channel=body["channel"]["id"],
+        ts=body["message"]["ts"],
+        blocks=llm_provider_menu_blocks,
+        text="Choose a LLM provider and model:"
+    )
+
+@app.action("llm_model_select_action")
+def handle_llm_model_select(ack, body, say):
+    global current_model
+    ack()  # Acknowledge the action
+    selected_value = body["actions"][0]["selected_option"]["value"]
+    if selected_value != "none":
+        current_model = selected_value
 
 @app.action("llm_provider_confirm_action")
 def handle_llm_provider_confirm(ack, body, say):
     ack()  # Acknowledge the action
-    global current_llm_provider
-    langchain_handler.set_model(current_llm_provider)
-    say(f"✅ Set to the selected LLM provider: {current_llm_provider}.")
+    global current_llm_provider, current_model
+    langchain_handler.set_model(current_llm_provider, current_model)
+    say(f"✅ Set to {current_llm_provider} {current_model}.")
 
 
 
@@ -156,7 +223,9 @@ def handle_app_mention(event, say):
     if event and 'text' in event:
         # 0. Handle the /select_llm_provider command
         if "/select_llm_provider" in event['text']:
-            say(blocks=llm_provider_menu_blocks, text="Choose a LLM provider:")
+            # Regenerate menu blocks to ensure current state
+            llm_provider_menu_blocks = generate_llm_menu_blocks()
+            say(blocks=llm_provider_menu_blocks, text="Choose a LLM provider and model.")
             return
         
         # 1. Parse query & check if the user has a thread id
@@ -249,7 +318,8 @@ def handle_app_mention(event, say):
             
             # 2.4 Summarize the paper using LangChain
             try:
-                say(f"🤖 [4/5] Generating AI Summary (with LLM provider: {current_llm_provider})...")
+                model_info = f"{current_llm_provider}" + (f" - {current_model}" if current_model else "")
+                say(f"🤖 [4/5] Generating AI Summary (with: {model_info})...")
                 summary = langchain_handler.summarize_paper(query, thread_id=thread_id, context=context, language=language)
                 summary = "# 📄 Summary \n\n────────── \n\n" + summary + "\n\n────────── \n\n"
                 summary = markdown_to_slack(summary)
@@ -259,7 +329,8 @@ def handle_app_mention(event, say):
             
             # 2.5 Digest and rank the related papers using LangChain (only if we have related papers)
             try:
-                say(f"🤖 [5/5] Ranking Related Papers (with LLM provider: {current_llm_provider})...")
+                model_info = f"{current_llm_provider}" + (f" - {current_model}" if current_model else "")
+                say(f"🤖 [5/5] Ranking Related Papers (with: {model_info})...")
                 if paper_meta:
                     paper_meta_full = f"{paper_meta_text}\nAbstract: {paper_meta['abstract']}"
                 else:
@@ -279,7 +350,8 @@ def handle_app_mention(event, say):
             
         # 3. Continue the conversation
         else:
-            say(f"🤖 Continuing the conversation (with LLM provider: {current_llm_provider})...")
+            model_info = f"{current_llm_provider}" + (f" - {current_model}" if current_model else "")
+            say(f"🤖 Continuing the conversation (with: {model_info})...")
             response = langchain_handler.call(query, thread_id)
             response = markdown_to_slack(response)
             if response and response.strip():
