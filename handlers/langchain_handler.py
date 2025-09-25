@@ -11,6 +11,7 @@ from typing import Sequence
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 from typing_extensions import Annotated, TypedDict
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from utils.text_optimizer import TextOptimizer
 from handlers.jina_handler import JinaHandler
@@ -129,6 +130,7 @@ class LangChainHandler:
         if os.environ.get("GOOGLE_API_KEY"):
             available_providers.append("Google Gemini")
         if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+            print(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")) 
             available_providers.append("Google VertexAI")
         if os.environ.get("ANTHROPIC_API_KEY"):
             available_providers.append("Anthropic")
@@ -196,7 +198,7 @@ class LangChainHandler:
         if provider == "OpenAI":
             return "chatgpt-4o-latest"
         elif provider == "Google Gemini" or provider == "Google VertexAI":
-            return "gemini-2.5-flash"
+            return "models/gemini-2.5-flash"
         elif provider == "Anthropic":
             return "claude-3-7-sonnet-latest"
         else:
@@ -209,18 +211,18 @@ class LangChainHandler:
         # Set default models if no specific model is provided [[memory:4396816]]
         if provider == "OpenAI":
             model_provider = "openai"
-        elif provider == "Google Gemini":
-            model_provider = "google_genai"
-        elif provider == "Google VertexAI":
-            model_provider = "google_vertexai"
+            selected_model = model if model else self.get_default_model(provider)
+            self.model = init_chat_model(selected_model, model_provider=model_provider)
         elif provider == "Anthropic":
             model_provider = "anthropic"
+            selected_model = model if model else self.get_default_model(provider)
+            self.model = init_chat_model(selected_model, model_provider=model_provider)
+        elif provider in ["Google Gemini", "Google VertexAI"]:
+            selected_model = model if model else "gemini-2.5-flash"
+            self.model = ChatGoogleGenerativeAI(model=selected_model)
         else:
             raise ValueError(f"Unsupported provider: {provider}")
-        
-        # Use provided model or fall back to default
-        selected_model = model if model else self.get_default_model(provider)
-        self.model = init_chat_model(selected_model, model_provider=model_provider)
+        print(f"Using model: {selected_model} from provider: {provider}")
 
     def init_app_with_memory(self):
         prompt_template = ChatPromptTemplate.from_messages(
