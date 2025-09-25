@@ -118,8 +118,17 @@ class LangChainHandler:
     def __init__(self):
         load_dotenv()
         os.environ["LANGSMITH_TRACING"] = "true"    # Enable LangChain tracing
-        self.set_model(self.available_providers[0]) # set the first available provider
+        self.model = None# set the first available provider
         self.app = self.init_app_with_memory()
+    
+    def ensure_model(self, provider=None):
+        if not self.model:
+            # provider が指定されていればそれを使う
+            if provider:
+                self.set_model(provider)
+            else:
+                # デフォルトで先頭の available_provider を使用
+                self.set_model(self.available_providers[0])
 
     @property
     def available_providers(self):
@@ -168,7 +177,8 @@ class LangChainHandler:
         app = workflow.compile(checkpointer=memory)
         return app
 
-    def summarize_paper(self, prompt: str, thread_id: str, context: str = "", language: str = "English"):
+    def summarize_paper(self, prompt: str, thread_id: str, context: str = "", language: str = "English", provider=None):
+        self.ensure_model(provider)
         config = {"configurable": {"thread_id": thread_id}}    # conversation thread id
         prompt = SUMMARY_PROMPT.format(query=prompt, context=context, language=language)
         input_messages = [HumanMessage(content=prompt)]
@@ -177,7 +187,8 @@ class LangChainHandler:
         }, config)
         return output["messages"][-1].content
 
-    def rank_related_papers(self, thread_id: str, main_paper: str, related_papers: str, language: str = "English"):
+    def rank_related_papers(self, thread_id: str, main_paper: str, related_papers: str, language: str = "English", provider=None):
+        self.ensure_model(provider)
         config = {"configurable": {"thread_id": thread_id}}    # conversation thread id
         prompt = RELATED_PAPERS_PROMPT.format(main_paper=main_paper, related_papers=related_papers, language=language)
         input_messages = [HumanMessage(content=prompt)]
@@ -186,7 +197,8 @@ class LangChainHandler:
         }, config)
         return output["messages"][-1].content
 
-    def call(self, prompt: str, thread_id: str):
+    def call(self, prompt: str, thread_id: str, provider=None):
+        self.ensure_model(provider)
         config = {"configurable": {"thread_id": thread_id}}    # conversation thread id
         input_messages = [HumanMessage(content=prompt)]
         output = self.app.invoke({
