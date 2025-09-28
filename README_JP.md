@@ -131,7 +131,7 @@ python start_server.py --reload
 - [x] PDF URL入力処理
 - [x] PDFファイルアップロード対応（Slack経由）
 - [x] PDFからのテキスト抽出
-- [x] LLM搭載の論文要約（GPT-4）
+- [x] LLM搭載の論文要約
 - [x] 関連論文の発見（Semantic Scholar API）
 - [x] Webhook統合を使用したFastAPI Webサーバー
 - [x] Event Subscriptionsを使用したSlack統合
@@ -141,9 +141,7 @@ python start_server.py --reload
 - [x] ファイルアップロード対応（URL以外）
 - [x] 複数のモデルプロバイダー対応
 - [ ] エラーハンドリングと検証の強化
-- [ ] AWS/GCPへのデプロイ
-- [ ] Slackの代替となるWebインターフェース
-- [ ] 複数論文のバッチ処理
+- [ ] ソケットモードからWeb APIモードへの変更
 
 ## 🤝 コントリビューション
 

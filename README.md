@@ -104,8 +104,7 @@ The startup script will:
 ### Using the Agent
 
 1. **Slack Commands**
-   - `@YourBot https://arxiv.org/pdf/2301.00000.pdf Summarize this paper` - Analyze and summarize any PDF paper
-   - `@YourBot Can you find related papers to the one I just shared?` - Discover similar research using Semantic Scholar
+   - `@YourBot https://arxiv.org/pdf/2301.00000.pdf Summarize this paper` - Analyze and summarize any PDF paper, and automatically discover similar research
    - `@YourBot /new Now summarize this paper https://...` - Start a fresh conversation (clears previous context)
    - `@YourBot /select_llm_provider` - Choose your preferred LLM provider (ChatGPT, Google, ...)
 
@@ -141,9 +140,7 @@ The startup script will:
 - [x] File upload support (beyond URLs)
 - [x] Support different model providers
 - [ ] Enhanced error handling and validation
-- [ ] Deploy to AWS/GCP
-- [ ] Web interface alternative to Slack
-- [ ] Batch processing of multiple papers
+- [ ] Change from socket mode to web api mode
 
 ## 🤝 Contributing
 
