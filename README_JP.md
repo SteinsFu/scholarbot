@@ -2,6 +2,10 @@
 
 **🌐 言語 | Language:** [English](README.md) | **日本語**
 
+<p align="center">
+  <img src="images/scholarbot.png" alt="ScholarBot" width="200" />
+</p>
+
 > **注意:** 最も正確で最新の情報については、[English版](README.md)をご参照ください。
 
 学術論文の分析、洞察の抽出、関連研究の発見を行う強力なAIボット。LangChain、OpenAI、Slack Bot統合で構築されています。

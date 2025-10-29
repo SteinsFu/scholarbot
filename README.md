@@ -2,6 +2,10 @@
 
 **🌐 Language | 言語:** **English** | [日本語](README_JP.md)
 
+<p align="center">
+  <img src="images/scholarbot.png" alt="ScholarBot" width="200" />
+</p>
+
 > **Note:** This English version contains the most accurate and up-to-date information.
 
 A powerful AI bot for analyzing academic papers, extracting insights, and discovering related research using advanced language models and PDF processing capabilities. Built with LangChain, OpenAI, and Slack Bot integration.
